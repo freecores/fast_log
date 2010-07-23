@@ -7,7 +7,7 @@ Designed and coded by: Michael Dunn, http://www.cantares.on.ca/
 Executes every cycle, with a latency of 3.
 License: Free to use & modify, but please keep this header intact.
 July 18, 2010, Kitchener, Ontario, Canada
-This version not yet tested...
+This version not yet tested... In fact, has a problem. Stay tuned.
 */
 
 (
