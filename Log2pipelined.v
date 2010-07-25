@@ -1,13 +1,17 @@
 module Log2pipelined
 
 /* 
-A fast base-2 logarithm function, 24 bits in, 8 bits out.
+A fast base-2 logarithm function, 24 bits (21 used) in, 8 bits out.
 Designed and coded by: Michael Dunn, http://www.cantares.on.ca/
 (more info at the web site - see "Extras")
 Executes every cycle, with a latency of 3.
+
+This version has a smallish lookup table, hence, a slightly uneven output.
+Valid input range = 000100 - FFFFFF. In effect, there is a binary point:
+xxxx.yy. Logs of inputs below 1.00 are negative, and not handled by this design.
+
 License: Free to use & modify, but please keep this header intact.
-July 18, 2010, Kitchener, Ontario, Canada
-This version not yet tested... In fact, has a problem. Stay tuned.
+July 22, 2010, Kitchener, Ontario, Canada
 */
 
 (
@@ -24,24 +28,22 @@ reg	[3:0]	priencout1;
 reg	[3:0]	priencout2;
 reg	[3:0]	priencout3;
 reg	[4:0]	barrelout;
-reg	[20:0]	barrelin;
+reg	[19:0]	barrelin;
 reg	[3:0]	LUTout; 
 
 
+assign	DOUT	=	{priencout3, LUTout};	// Basic top-level connectivity
 
-always @(posedge clk) 						// Basic top-level connectivity
+always @(posedge clk) 					
 begin
 	priencout2	<=	priencout1;
 	priencout3	<=	priencout2;
-	barrelin	<=	DIN[23:3];
+	barrelin	<=	DIN[22:3];
 end
 
-assign	DOUT	=	{priencout3, LUTout};
 
-
-
-wire [20:0] tmp1 =	(barrelin << ~priencout1);
-always @(posedge clk)						// Barrel shifter - OMG, it's a primitive in Verilog!
+wire [19:0] tmp1 =	(barrelin << ~priencout1);	// Barrel shifter - OMG, it's a primitive in Verilog!
+always @(posedge clk)
 begin
 	barrelout	<=	tmp1[19:15];
 end
